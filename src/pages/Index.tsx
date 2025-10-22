@@ -369,10 +369,14 @@ const Index = () => {
                 Оставьте заявку и получите бесплатный расчет стоимости
               </p>
               <div className="space-y-4">
-                <div className="flex items-center gap-3">
+                <a href="tel:+79951100799" className="flex items-center gap-3 hover:text-primary transition-colors">
                   <Icon name="Phone" size={24} className="text-primary" />
-                  <span className="text-lg">+7 (999) 123-45-67</span>
-                </div>
+                  <span className="text-lg">+7 (995) 110-07-99</span>
+                </a>
+                <a href="https://wa.me/79951100799" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 hover:text-primary transition-colors">
+                  <Icon name="MessageCircle" size={24} className="text-primary" />
+                  <span className="text-lg">WhatsApp: +7 (995) 110-07-99</span>
+                </a>
                 <div className="flex items-center gap-3">
                   <Icon name="Mail" size={24} className="text-primary" />
                   <span className="text-lg">info@metallmaster.ru</span>
