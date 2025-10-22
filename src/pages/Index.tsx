@@ -2,15 +2,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 import Icon from "@/components/ui/icon";
 import { useState } from "react";
 
 const Index = () => {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
     message: "",
   });
+  const [callbackData, setCallbackData] = useState({
+    name: "",
+    phone: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const services = [
     {
@@ -71,9 +80,68 @@ const Index = () => {
     },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const sendToTelegram = async (data: { name: string; phone: string; message?: string }) => {
+    const response = await fetch('https://functions.poehali.dev/95eff8ed-1746-45e4-a86c-000e0b1e4d6d', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Ошибка отправки');
+    }
+    
+    return response.json();
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    setIsSubmitting(true);
+    
+    try {
+      await sendToTelegram(formData);
+      toast({
+        title: "Заявка отправлена!",
+        description: "Мы свяжемся с вами в ближайшее время",
+      });
+      setFormData({ name: "", phone: "", message: "" });
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось отправить заявку. Попробуйте позже.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCallbackSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      await sendToTelegram({
+        ...callbackData,
+        message: "Заказ обратного звонка",
+      });
+      toast({
+        title: "Заявка принята!",
+        description: "Мы перезвоним вам в течение 15 минут",
+      });
+      setCallbackData({ name: "", phone: "" });
+      setIsDialogOpen(false);
+    } catch (error) {
+      toast({
+        title: "Ошибка",
+        description: "Не удалось отправить заявку. Попробуйте позже.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -91,10 +159,42 @@ const Index = () => {
             <a href="#testimonials" className="hover:text-primary transition-colors">Отзывы</a>
             <a href="#contact" className="hover:text-primary transition-colors">Контакты</a>
           </div>
-          <Button className="bg-primary hover:bg-primary/90">
-            <Icon name="Phone" size={18} className="mr-2" />
-            Заказать звонок
-          </Button>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-primary hover:bg-primary/90">
+                <Icon name="Phone" size={18} className="mr-2" />
+                Заказать звонок
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Заказать обратный звонок</DialogTitle>
+              </DialogHeader>
+              <form onSubmit={handleCallbackSubmit} className="space-y-4 mt-4">
+                <div>
+                  <Input 
+                    placeholder="Ваше имя"
+                    value={callbackData.name}
+                    onChange={(e) => setCallbackData({...callbackData, name: e.target.value})}
+                    required
+                  />
+                </div>
+                <div>
+                  <Input 
+                    placeholder="Телефон"
+                    type="tel"
+                    value={callbackData.phone}
+                    onChange={(e) => setCallbackData({...callbackData, phone: e.target.value})}
+                    required
+                  />
+                </div>
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isSubmitting}>
+                  {isSubmitting ? "Отправка..." : "Заказать звонок"}
+                  <Icon name="Phone" size={18} className="ml-2" />
+                </Button>
+              </form>
+            </DialogContent>
+          </Dialog>
         </nav>
       </header>
 
@@ -311,8 +411,8 @@ const Index = () => {
                       rows={4}
                     />
                   </div>
-                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white">
-                    Отправить заявку
+                  <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-white" disabled={isSubmitting}>
+                    {isSubmitting ? "Отправка..." : "Отправить заявку"}
                     <Icon name="Send" size={18} className="ml-2" />
                   </Button>
                 </form>
