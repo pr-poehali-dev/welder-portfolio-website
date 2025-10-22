@@ -377,13 +377,16 @@ const Index = () => {
                   <Icon name="MessageCircle" size={24} className="text-primary" />
                   <span className="text-lg">WhatsApp: +7 (995) 110-07-99</span>
                 </a>
-                <div className="flex items-center gap-3">
+                <a href="mailto:skfeniksug2@gmail.com" className="flex items-center gap-3 hover:text-primary transition-colors">
                   <Icon name="Mail" size={24} className="text-primary" />
-                  <span className="text-lg">info@metallmaster.ru</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Icon name="MapPin" size={24} className="text-primary" />
-                  <span className="text-lg">г. Москва, ул. Промышленная, 15</span>
+                  <span className="text-lg">skfeniksug2@gmail.com</span>
+                </a>
+                <div className="flex items-start gap-3">
+                  <Icon name="MapPin" size={24} className="text-primary flex-shrink-0" />
+                  <div className="text-lg">
+                    <div>г. Анапа</div>
+                    <div className="text-white/80 text-base mt-1">Выезжаем в соседние города и за пределы региона</div>
+                  </div>
                 </div>
               </div>
             </div>
